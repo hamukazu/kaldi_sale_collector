@@ -1,0 +1,2 @@
+# kaldi_sale_collector
+カルディのセール情報を収集します
