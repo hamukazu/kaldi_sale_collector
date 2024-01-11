@@ -1,6 +1,5 @@
 import os
 import time
-from collections import defaultdict
 import csv
 import bs4
 import requests
@@ -32,12 +31,11 @@ class ShopInfoDownloader:
                 for j in range(2, n_pages + 1):
                     print(i, j)
                     r = requests.get(URL_TEMPLATE2.format(i, j))
-                    if save_dir is None:
-                        ret.append(r.text)
-                    else:
+                    if save_dir is not None:
                         fn = f"{save_dir}/{i:02d}_{j:02d}.html"
                         with open(fn, "w") as fp:
                             fp.write(r.text)
+                    ret.append(r.text)
                 time.sleep(0.5)
         else:
             for fn in sorted(os.listdir(save_dir)):
