@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>カルディセール情報</title>
+</head>
+<body>
+  <h1>カルディセール情報</h1>
+  <p>内容の正確性については一切責任を持ちませんのでご了承ください。</p>
+  <p>そのうち自動で更新するようにしますが、今のところ手動なので気が向いたときに更新します。</p>
+  <p>{{datestr}}更新</p>
+
+  <div class="sale">
+    {% for pref, pref_en in prefectures %}
+    {% if pref_sales[pref]!=[] %}
+    <h3>{{ pref }}</h3>
+    {% for s in pref_sales[pref] %}
+    {{s["shop"]}}
+    {{s["title"]}}
+    {{s["date"]}}<br>
+    {% endfor %}
+    {% endif %}
+    {% endfor %}
+  </div>
+</body>

@@ -2,8 +2,10 @@ import os
 import time
 import csv
 import bs4
+import json
 import requests
 from selenium import webdriver
+
 
 URL = "https://kaldi.co.jp"
 
@@ -58,7 +60,8 @@ def main():
     sid = SaleInfoDownloader()
     html = sid.get(save_dir="sale")
     saleinfo = parse(html)
-    print(saleinfo)
+    with open("sale.json", "w") as fp:
+        json.dump(saleinfo, fp)
 
 
 if __name__ == "__main__":
