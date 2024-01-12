@@ -1,0 +1,3 @@
+[submodule "japan_prefectures"]
+	path = japan_prefectures
+	url = https://github.com/hamukazu/japan_prefectures
