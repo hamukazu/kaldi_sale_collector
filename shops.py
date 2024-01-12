@@ -1,13 +1,15 @@
 import os
 import time
 import csv
+import json
+import itertools
 import bs4
 import requests
 
 URL_TEMPLATE1 = (
     "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=0&ftop=1&adr={:02d}"
 )
-URL_TEMPLATE2 = "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=0&ftop=1&adr={:02d}&pg={}"
+URL_TEMPLATE = "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=0&ftop=1&adr={:02d}&pg={}"
 
 
 class ShopInfoDownloader:
@@ -20,22 +22,18 @@ class ShopInfoDownloader:
             if save_dir is not None:
                 os.makedirs(save_dir, exist_ok=True)
             for i in range(1, 48):
-                r = requests.get(URL_TEMPLATE1.format(i))
-                soup = bs4.BeautifulSoup(r.text, "html.parser")
-                pagenation = soup.find_all("div", class_="pagenation")
-                n_pages = len(pagenation[0].find_all("a")) - 1
-                fn = f"{save_dir}/{i:02d}_01.html"
-                with open(fn, "w") as fp:
-                    fp.write(r.text)
-
-                for j in range(2, n_pages + 1):
-                    print(i, j)
-                    r = requests.get(URL_TEMPLATE2.format(i, j))
+                for pg in itertools.count(1):
+                    r = requests.get(URL_TEMPLATE.format(i, pg))
+                    print(i,pg)
                     if save_dir is not None:
-                        fn = f"{save_dir}/{i:02d}_{j:02d}.html"
+                        fn = f"{save_dir}/{i:02d}_{pg}.html"
                         with open(fn, "w") as fp:
                             fp.write(r.text)
                     ret.append(r.text)
+                    soup = bs4.BeautifulSoup(r.text, "html.parser")
+                    pagenation = soup.find_all("div", class_="pagenation")
+                    if len(pagenation[0].find_all("a", string="次へ")) == 0:
+                        break
                 time.sleep(0.5)
         else:
             for fn in sorted(os.listdir(save_dir)):
@@ -70,6 +68,10 @@ def main():
         for s in shops:
             writer.writerow((index,) + s)
             index += 1
+    shops2 = list(map(lambda x:
+                      {"prefecture":x[0], "name":x[1], "address": x[2]}, shops))
+    with open("shops.json", "w") as fp:
+        json.dump(shops2, fp)
 
 
 if __name__ == "__main__":
