@@ -1,24 +1,68 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
 <title>カルディセール情報</title>
+  <meta charset="utf-8">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </head>
 <body>
-  <h1>カルディセール情報</h1>
-  <p>内容の正確性については一切責任を持ちませんのでご了承ください。</p>
-  <p>そのうち自動で更新するようにしますが、今のところ手動なので気が向いたときに更新します。</p>
-  <p>{{datestr}}更新</p>
-
-  <div class="sale">
-    {% for pref, pref_en in prefectures %}
-    {% if pref_sales[pref]!=[] %}
-    <h3>{{ pref }}</h3>
-    {% for s in pref_sales[pref] %}
-    {{s["shop"]}}
-    {{s["title"]}}
-    {{s["date"]}}<br>
-    {% endfor %}
-    {% endif %}
-    {% endfor %}
+  <div class="jumbotron text-center py-5">
+    <h1>カルディセール情報</h1>
+    <p>{{datestr}}更新</p>
   </div>
+  <div class="container">
+    <p>内容の正確性については一切責任を持ちませんので、適宜公式ホームページでご確認ください。</p>
+    <p>そのうち自動で更新するようにしますが、今のところ手動なので気が向いたときに更新します。</p>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      {% for batch in batched(prefectures, 12) %}
+      {% for pref, pref_en in batch -%}
+      {% if pref_sales[pref]!=[] -%} 
+      <div class="col-sm-1 py-1"><a href="#{{pref_en}}">{{pref}}</a></div>
+      {%- else -%}
+      <div class="col-sm-1 py-1">{{pref}}</div>
+      {%- endif %}
+      {%- endfor %}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="sale">
+  {% for pref, pref_en in prefectures -%}
+  {% if pref_sales[pref]!=[] -%}
+  <div class="container px-4 py-5">
+    <h2 class="pb-2 border-bottom" id="{{pref_en}}">{{pref}}</h2>
+    {% for batch in batched(pref_sales[pref], 3) -%}
+    <div class="row row-cols-1 row-cols-lg-3">
+      {% for s in batch -%}
+      <div class="col d-flex align-items-start">
+        <div class="container py-3">
+          <ul class="list-group">
+            <li class="list-group-item"><h5 class="fs-5 text-body-emphasis">
+                {%- if s["shop_note"]=="" -%}
+                {{s["shop"]}}
+                {%- else -%}
+                <a href="#" data-bs-toggle="tooltip" title="{{s["shop_note"]}}">{{s["shop"]}}</a>
+                {%- endif -%}</h5></li>
+            <li class="list-group-item">{{s["title"]}}</li>
+            <li class="list-group-item small">{{s["date"]}}</li>
+            <li class="list-group-item small">{{s["detail"]}}</li>
+          </ul>
+        </div>
+      </div>
+      {%- endfor %}
+    </div>
+    {%- endfor %}
+  </div>
+  {%- endif %}
+  {%- endfor %}
+  </div>
+<script>
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+  return new bootstrap.Tooltip(tooltipTriggerEl)
+})
+</script>
 </body>

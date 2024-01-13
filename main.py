@@ -10,6 +10,24 @@ def trim(s):
     return ss.strip()
 
 
+def split(s):
+    if "【" in s:
+        idx = s.index("【")
+        return (s[:idx], s[idx:])
+    else:
+        return (s, "")
+
+
+# itertools.batched is implemented in Python 3.12
+# This function is for earlier version
+def batched(l, n):
+    ret = []
+    while len(l) > 0:
+        ret.append(l[:n])
+        l = l[n:]
+    return ret
+
+
 def main():
     with open("shops.json") as fp:
         shops = json.load(fp)
@@ -33,7 +51,10 @@ def main():
     d = dict(l)
     print(d)
     for s in sale:
-        pref = d.get(trim(s["shop"]), "NOT_FOUND")
+        shop, shop_note = split(s["shop"])
+        s["shop"] = shop
+        s["shop_note"] = shop_note
+        pref = d.get(s["shop"], "NOT_FOUND")
         pref_sales[pref].append(s)
     for pref, pref_en in prefectures:
         if len(pref_sales[pref]) > 0:
@@ -46,9 +67,12 @@ def main():
     template = env.get_template("template.html")
     datestr = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%H:%M")
     html = template.render(
-        prefectures=prefectures, pref_sales=pref_sales, datestr=datestr
+        prefectures=prefectures,
+        pref_sales=pref_sales,
+        datestr=datestr,
+        batched=batched,
     )
-    with open("kaldi_sale_info.html", "w") as fp:
+    with open("index.html", "w") as fp:
         fp.write(html)
 
 
