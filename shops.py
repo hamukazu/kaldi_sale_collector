@@ -6,9 +6,6 @@ import itertools
 import bs4
 import requests
 
-URL_TEMPLATE1 = (
-    "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=0&ftop=1&adr={:02d}"
-)
 URL_TEMPLATE = "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=0&ftop=1&adr={:02d}&pg={}"
 
 
@@ -24,7 +21,7 @@ class ShopInfoDownloader:
             for i in range(1, 48):
                 for pg in itertools.count(1):
                     r = requests.get(URL_TEMPLATE.format(i, pg))
-                    print(i,pg)
+                    print(i, pg)
                     if save_dir is not None:
                         fn = f"{save_dir}/{i:02d}_{pg}.html"
                         with open(fn, "w") as fp:
@@ -68,8 +65,9 @@ def main():
         for s in shops:
             writer.writerow((index,) + s)
             index += 1
-    shops2 = list(map(lambda x:
-                      {"prefecture":x[0], "name":x[1], "address": x[2]}, shops))
+    shops2 = list(
+        map(lambda x: {"prefecture": x[0], "name": x[1], "address": x[2]}, shops)
+    )
     with open("shops.json", "w") as fp:
         json.dump(shops2, fp)
 

@@ -17,24 +17,25 @@
   </div>
 
   <div class="container">
+    {% for batch in batched(prefectures, 12) %}
     <div class="row">
-      {% for batch in batched(prefectures, 12) %}
       {% for pref, pref_en in batch -%}
-      {% if pref_sales[pref]!=[] -%} 
-      <div class="col-sm-1 py-1"><a href="#{{pref_en}}">{{pref}}</a></div>
+      {% if pref_sale[pref]!=[] -%} 
+      <div class="col-sm-1 py-1 small"><a href="#{{pref_en}}">{{pref}}</a></div>
       {%- else -%}
-      <div class="col-sm-1 py-1">{{pref}}</div>
+      <div class="col-sm-1 py-1 small">{{pref}}</div>
       {%- endif %}
       {%- endfor %}
+    </div>
       {% endfor %}
     </div>
   </div>
   <div class="sale">
   {% for pref, pref_en in prefectures -%}
-  {% if pref_sales[pref]!=[] -%}
+  {% if pref_sale[pref]!=[] -%}
   <div class="container px-4 py-5">
     <h2 class="pb-2 border-bottom" id="{{pref_en}}">{{pref}}</h2>
-    {% for batch in batched(pref_sales[pref], 3) -%}
+    {% for batch in batched(pref_sale[pref], 3) -%}
     <div class="row row-cols-1 row-cols-lg-3">
       {% for s in batch -%}
       <div class="col d-flex align-items-start">

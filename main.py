@@ -28,11 +28,7 @@ def batched(l, n):
     return ret
 
 
-def main():
-    with open("shops.json") as fp:
-        shops = json.load(fp)
-    with open("sale.json") as fp:
-        sale = json.load(fp)
+def get_prefectures():
     prefectures = []
     with open("japan_prefectures/japan_prefectures.csv") as fp:
         reader = csv.reader(fp)
@@ -40,40 +36,53 @@ def main():
         for row in reader:
             pref = row[3] if row[4] == "道" else row[3] + row[4]
             prefectures.append((pref, row[5]))
-    pref_sales = {}
+    return prefectures
+
+
+def get_pref_sale(prefectures, shops, sale):
+    pref_sale = {}
     for pref, _ in prefectures:
-        pref_sales[pref] = []
-    pref_sales["NOT_FOUND"] = []
+        pref_sale[pref] = []
+    pref_sale["NOT_FOUND"] = []
 
     l = []
     for s in shops:
         l.append((trim(s["name"]), s["prefecture"]))
     d = dict(l)
-    print(d)
     for s in sale:
         shop, shop_note = split(s["shop"])
         s["shop"] = shop
         s["shop_note"] = shop_note
         pref = d.get(s["shop"], "NOT_FOUND")
-        pref_sales[pref].append(s)
-    for pref, pref_en in prefectures:
-        if len(pref_sales[pref]) > 0:
-            print(f"=== {pref} ===")
-            print(pref_sales[pref])
-    print("******* NOT FOUND *******")
-    print(pref_sales["NOT_FOUND"])
+        pref_sale[pref].append(s)
+    if len(pref_sale["NOT_FOUND"]) > 0:
+        print("******* NOT FOUND *******")
+        print(pref_sale["NOT_FOUND"])
+    return pref_sale
 
+
+def write(prefectures, pref_sale, fp):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader("./"))
     template = env.get_template("template.html")
     datestr = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%H:%M")
     html = template.render(
         prefectures=prefectures,
-        pref_sales=pref_sales,
+        pref_sale=pref_sale,
         datestr=datestr,
         batched=batched,
     )
+    fp.write(html)
+
+
+def main():
+    with open("shops.json") as fp:
+        shops = json.load(fp)
+    with open("sale.json") as fp:
+        sale = json.load(fp)
+    prefectures = get_prefectures()
+    pref_sale = get_pref_sale(prefectures, shops, sale)
     with open("index.html", "w") as fp:
-        fp.write(html)
+        write(prefectures, pref_sale, fp)
 
 
 if __name__ == "__main__":
