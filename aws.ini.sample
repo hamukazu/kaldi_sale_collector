@@ -1,0 +1,6 @@
+[credential]
+AWS_ACCESS_KEY_ID=xxxxxxxxxx
+AWS_SECRET_ACCESS_KEY=xxxxxxxxxxx
+
+[s3]
+BUCKET=kaldi-info
