@@ -26,7 +26,9 @@ def lambda_handler(event, context):
     user_email = config["user"]["email"]
 
     ssh_prefix = "GIT_SSH_COMMAND='ssh -i github -o IdentitiesOnly=yes' "
-    cmd = ssh_prefix + "git clone git@github.com:hamukazu/kaldi_sale_info.git"
+    cmd = (
+        ssh_prefix + "git clone -b gh-pages git@github.com:hamukazu/kaldi_sale_info.git"
+    )
     os.system(cmd)
     write_html("./kaldi_sale_info/index.html")
     os.chdir("./kaldi_sale_info/")
