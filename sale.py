@@ -33,6 +33,7 @@ class SaleInfoDownloader:
                 fn = f"{save_dir}/sale.html"
                 with open(fn, "w") as fp:
                     fp.write(driver.page_source)
+            print("URL:", driver.current_url)
             return driver.page_source
         else:
             fn = f"{save_dir}/sale.html"
