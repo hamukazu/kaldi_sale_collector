@@ -2,7 +2,7 @@ import json
 import csv
 import jinja2
 import re
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 
 
 def trim(s):
@@ -64,7 +64,8 @@ def get_pref_sale(prefectures, shops, sale):
 def write(prefectures, pref_sale, fp):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader("./"))
     template = env.get_template("template.html")
-    datestr = datetime.strftime(datetime.now(), "%Y-%m-%d %H:%H:%M")
+    tz_jst = timezone(timedelta(hours=9), name="JST")
+    datestr = datetime.strftime(datetime.now(tz=tz_jst), "%Y-%m-%d %H:%H:%M")
     html = template.render(
         prefectures=prefectures,
         pref_sale=pref_sale,

@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import configparser
 import datastore
 import main
@@ -24,23 +25,34 @@ def lambda_handler(event, context):
     config.read("github.ini")
     user_name = config["user"]["name"]
     user_email = config["user"]["email"]
-
-    ssh_prefix = "GIT_SSH_COMMAND='ssh -i github -o IdentitiesOnly=yes' "
+    current_dir = os.getcwd()
+    shutil.copy2(f"{current_dir}/github", "/tmp/github")
+    os.chmod("/tmp/github", 0o600)
+    os.chdir("/tmp")
+    os.system("ls -l")
+    ssh_prefix = f"GIT_SSH_COMMAND='ssh -i /tmp/github -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' HOME=/tmp "
     cmd = (
         ssh_prefix + "git clone -b gh-pages git@github.com:hamukazu/kaldi_sale_info.git"
     )
+    print(cmd)
     os.system(cmd)
-    write_html("./kaldi_sale_info/index.html")
-    os.chdir("./kaldi_sale_info/")
+    os.chdir(current_dir)
+    write_html("/tmp/kaldi_sale_info/index.html")
+    os.chdir("/tmp/kaldi_sale_info/")
     cmd = "git add index.html"
+    print(cmd)
     os.system(cmd)
     cmd = f"git config --local user.name '{user_name}'"
+    print(cmd)
     os.system(cmd)
     cmd = f"git config --local user.email '{user_email}'"
+    print(cmd)
     os.system(cmd)
     cmd = "git commit -m 'auto commit'"
+    print(cmd)
     os.system(cmd)
     cmd = ssh_prefix + "git push"
+    print(cmd)
     os.system(cmd)
 
 
