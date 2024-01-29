@@ -25,8 +25,15 @@ class SaleInfoDownloader:
                     href = a["href"]
                     break
             options = webdriver.chrome.options.Options()
-            options.add_argument("--disable-extensions")
+            options.add_argument("start-maximized")
+            options.add_argument("enable-automation")
             options.add_argument("--headless=new")
+            options.add_argument("--disable-extensions")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--remote-debugging-pipe")
+            options.add_argument("--disable-browser-side-navigation")
             driver = webdriver.Chrome(options=options)
             driver.get(href)
             if save_dir is not None:
@@ -59,8 +66,18 @@ def parse(html):
 
 def main():
     sid = SaleInfoDownloader()
-    html = sid.get(save_dir="sale")
-    saleinfo = parse(html)
+    n = 3
+    while n > 0:
+        html = sid.get(save_dir="sale")
+        try:
+            saleinfo = parse(html)
+            break
+        except e as Exception:
+            print("PARSE ERROR:", e)
+            print(html)
+        finally:
+            n -= 1
+
     with open("sale.json", "w") as fp:
         json.dump(saleinfo, fp)
 
