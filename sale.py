@@ -71,12 +71,15 @@ def main():
         html = sid.get(save_dir="sale")
         try:
             saleinfo = parse(html)
+            b = int("a")
+            print("hey")
             break
-        except e as Exception:
+        except Exception as e:
             print("PARSE ERROR:", e)
             print(html)
         finally:
             n -= 1
+            time.sleep(1)
 
     with open("sale.json", "w") as fp:
         json.dump(saleinfo, fp)

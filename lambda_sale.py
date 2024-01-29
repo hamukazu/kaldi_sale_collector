@@ -1,4 +1,5 @@
 import json
+import time
 import datastore
 import sale
 
@@ -7,8 +8,21 @@ def lambda_handler(event, context):
     store = datastore.store("sale.json")
     sid = sale.SaleInfoDownloader()
     html = sid.get()
-    saleinfo = sale.parse(html)
-    store.put(json.dumps(saleinfo))
+    n = 3
+    success = False
+    while n > 0:
+        try:
+            saleinfo = sale.parse(html)
+            sucess = True
+            break
+        except Exception as e:
+            print("PARSE ERROR:", e)
+            print(html)
+        finally:
+            n -= 1
+            time.sleep(1)
+    if success:
+        store.put(json.dumps(saleinfo))
 
 
 if __name__ == "__main__":
