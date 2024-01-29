@@ -13,7 +13,7 @@ def lambda_handler(event, context):
     while n > 0:
         try:
             saleinfo = sale.parse(html)
-            sucess = True
+            success = True
             break
         except Exception as e:
             print("PARSE ERROR:", e)

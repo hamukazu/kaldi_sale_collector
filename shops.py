@@ -21,7 +21,6 @@ class ShopInfoDownloader:
             for i in range(1, 48):
                 for pg in itertools.count(1):
                     r = requests.get(URL_TEMPLATE.format(i, pg))
-                    print(i, pg)
                     if save_dir is not None:
                         fn = f"{save_dir}/{i:02d}_{pg}.html"
                         with open(fn, "w") as fp:

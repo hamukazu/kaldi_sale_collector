@@ -3,6 +3,7 @@ import time
 import csv
 import bs4
 import json
+from tempfile import mkdtemp
 import requests
 from selenium import webdriver
 
@@ -25,16 +26,23 @@ class SaleInfoDownloader:
                     href = a["href"]
                     break
             options = webdriver.chrome.options.Options()
-            options.add_argument("start-maximized")
-            options.add_argument("enable-automation")
+            service = webdriver.ChromeService("/opt/chromedriver")
+
+            options.binary_location = "/opt/chrome/chrome"
             options.add_argument("--headless=new")
-            options.add_argument("--disable-extensions")
-            options.add_argument("--disable-gpu")
             options.add_argument("--no-sandbox")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--window-size=1280x1696")
+            options.add_argument("--single-process")
             options.add_argument("--disable-dev-shm-usage")
-            options.add_argument("--remote-debugging-pipe")
-            options.add_argument("--disable-browser-side-navigation")
-            driver = webdriver.Chrome(options=options)
+            options.add_argument("--disable-dev-tools")
+            options.add_argument("--no-zygote")
+            options.add_argument(f"--user-data-dir={mkdtemp()}")
+            options.add_argument(f"--data-path={mkdtemp()}")
+            options.add_argument(f"--disk-cache-dir={mkdtemp()}")
+            options.add_argument("--remote-debugging-port=9222")
+
+            driver = webdriver.Chrome(options=options, service=service)
             driver.get(href)
             if save_dir is not None:
                 fn = f"{save_dir}/sale.html"
@@ -69,17 +77,7 @@ def main():
     n = 3
     while n > 0:
         html = sid.get(save_dir="sale")
-        try:
-            saleinfo = parse(html)
-            b = int("a")
-            print("hey")
-            break
-        except Exception as e:
-            print("PARSE ERROR:", e)
-            print(html)
-        finally:
-            n -= 1
-            time.sleep(1)
+        saleinfo = parse(html)
 
     with open("sale.json", "w") as fp:
         json.dump(saleinfo, fp)
