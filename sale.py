@@ -26,7 +26,10 @@ class SaleInfoDownloader:
                     href = a["href"]
                     break
             options = webdriver.chrome.options.Options()
-            service = webdriver.ChromeService("/opt/chromedriver")
+            if os.uname().sysname != "Darwin":
+                service = webdriver.ChromeService("/opt/chromedriver")
+            else:
+                service = None
 
             options.binary_location = "/opt/chrome/chrome"
             options.add_argument("--headless=new")
