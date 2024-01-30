@@ -12,8 +12,9 @@
     <p>{{datestr}}更新</p>
   </div>
   <div class="container">
-    <p>内容の正確性については一切責任を持ちませんので、適宜公式ホームページでご確認ください。</p>
     <p>毎朝9時頃に自動で更新します。</p>
+    <p>内容の正確性については一切責任を持ちませんので、適宜<a href="https://kaldi.co.jp/">公式ホームページ</a>でご確認ください。</p>
+    <p>これを生成するシステムのソースコードは<a href="https://github.com/hamukazu/kaldi_sale_collector">ここ</a>にあります。バグ報告等はGitHubのIssueでお願いします。</p>
   </div>
 
   <div class="container">
@@ -48,7 +49,11 @@
                 <a href="#" data-bs-toggle="tooltip" title="{{s["shop_note"]}}">{{s["shop"]}}</a>
                 {%- endif -%}</h5></li>
             <li class="list-group-item">{{s["title"]}}</li>
+            {% if s["include_now"] -%}
+            <li class="list-group-item small bg-warning">{{s["date"]}}</li>
+            {%- else -%}
             <li class="list-group-item small">{{s["date"]}}</li>
+            {%- endif %}
             <li class="list-group-item small">{{s["detail"]}}</li>
           </ul>
         </div>
