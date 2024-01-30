@@ -3,9 +3,11 @@ import configparser
 
 
 class store:
-    def __init__(self, key):
+    def __init__(self, key, ini_file=None):
         config = configparser.ConfigParser()
-        config.read("aws.ini")
+        if ini_file is None:
+            ini_file = "./aws.ini"
+        config.read(ini_file)
         AWS_ACCESS_KEY_ID = config["credential"]["AWS_ACCESS_KEY_ID"]
         AWS_SECRET_ACCESS_KEY = config["credential"]["AWS_SECRET_ACCESS_KEY"]
         sess = sess = boto3.Session(

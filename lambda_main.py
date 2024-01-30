@@ -6,18 +6,19 @@ import datastore
 import main
 
 
-def write_html(filename):
-    store = datastore.store("shops.json")
+def write_html(filename, home_dir="."):
+    ini_file = f"{home_dir}/aws.ini"
+    store = datastore.store("shops.json", ini_file=ini_file)
     shops = json.loads(store.get())
-    store = datastore.store("sale.json")
+    store = datastore.store("sale.json", ini_file=ini_file)
     saleinfo = json.loads(store.get())
-    prefectures = main.get_prefectures()
+    prefectures = main.get_prefectures(home_dir)
     pref_sale = main.get_pref_sale(prefectures, shops, saleinfo)
-    store = datastore.store("pref_sale.json")
+    store = datastore.store("pref_sale.json", ini_file=ini_file)
     store.put(json.dumps(pref_sale))
 
     with open(filename, "w") as fp:
-        main.write(prefectures, pref_sale, fp)
+        main.write(prefectures, pref_sale, fp, home_dir)
 
 
 def lambda_handler(event, context):
@@ -25,8 +26,8 @@ def lambda_handler(event, context):
     config.read("github.ini")
     user_name = config["user"]["name"]
     user_email = config["user"]["email"]
-    current_dir = os.getcwd()
-    shutil.copy2(f"{current_dir}/github", "/tmp/github")
+    home_dir = os.getcwd()
+    shutil.copy2(f"{home_dir}/github", "/tmp/github")
     os.chmod("/tmp/github", 0o600)
     os.chdir("/tmp")
     os.system("ls -l")
@@ -36,8 +37,7 @@ def lambda_handler(event, context):
     )
     print(cmd)
     os.system(cmd)
-    os.chdir(current_dir)
-    write_html("/tmp/kaldi_sale_info/index.html")
+    write_html("/tmp/kaldi_sale_info/index.html", home_dir)
     os.chdir("/tmp/kaldi_sale_info/")
     cmd = "git add index.html"
     print(cmd)
