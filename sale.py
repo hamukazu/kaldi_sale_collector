@@ -74,10 +74,8 @@ def parse(html):
 
 def main():
     sid = SaleInfoDownloader()
-    n = 3
-    while n > 0:
-        html = sid.get(save_dir="sale")
-        saleinfo = parse(html)
+    html = sid.get(save_dir="sale")
+    saleinfo = parse(html)
 
     with open("sale.json", "w") as fp:
         json.dump(saleinfo, fp)
