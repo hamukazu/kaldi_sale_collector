@@ -64,6 +64,8 @@ def get_pref_sale(prefectures, shops, sale):
     for s in shops:
         l.append((trim(s["name"]), s["prefecture"]))
     d = dict(l)
+    tz_jst = timezone(timedelta(hours=9), name="JST")
+    now = datetime.now(tz=tz_jst)
     for s in sale:
         shop, shop_note = split(s["shop"])
         s["shop"] = shop
@@ -71,6 +73,7 @@ def get_pref_sale(prefectures, shops, sale):
         date_from, date_to = parse_date(s["date"])
         s["date_from"] = date_from
         s["date_to"] = date_to
+        s["include_now"] = include_now(now, date_from, date_to)
         pref = d.get(s["shop"], "NOT_FOUND")
         pref_sale[pref].append(s)
     if len(pref_sale["NOT_FOUND"]) > 0:
@@ -85,18 +88,10 @@ def write(prefectures, pref_sale, fp, home_dir="."):
     tz_jst = timezone(timedelta(hours=9), name="JST")
     now = datetime.now(tz=tz_jst)
     datestr = datetime.strftime(now, "%Y-%m-%d %H:%H:%M")
-    pref_sale_modified = {}
-    for k in pref_sale:
-        ss = []
-        for d in pref_sale[k]:
-            dd = d.copy()
-            dd["include_now"] = include_now(now, dd["date_from"], dd["date_to"])
-            ss.append(dd)
-        pref_sale_modified[k] = ss
 
     html = template.render(
         prefectures=prefectures,
-        pref_sale=pref_sale_modified,
+        pref_sale=pref_sale,
         datestr=datestr,
         batched=batched,
     )
