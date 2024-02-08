@@ -7,7 +7,9 @@ import sale
 def lambda_handler(event, context):
     store = datastore.store("sale.json")
     sid = sale.SaleInfoDownloader()
+    store_html = datastore.store("sale.html")
     html = sid.get()
+    store_html.put(html)
     n = 3
     success = False
     while n > 0:
