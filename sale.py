@@ -47,6 +47,7 @@ class SaleInfoDownloader:
 
             driver = webdriver.Chrome(options=options, service=service)
             driver.get(href)
+            driver.implicitly_wait(3)
             if save_dir is not None:
                 fn = f"{save_dir}/sale.html"
                 with open(fn, "w") as fp:
@@ -66,10 +67,22 @@ def parse(html):
     saleinfo = []
     for tr in trs:
         shop = tr.find("a").text
-        address = tr.find("td", class_="saleadress").text
-        title = tr.find("td", class_="saletitle").text
-        date = tr.find("p", class_="saledate").text
-        detail = tr.find("p", class_="saledetail").text
+        shop = shop.strip()
+        address = tr.find(class_="saleadress").text
+        address = address.strip()
+        f = tr.find(class_="saletitle")
+        if f is None:
+            title = tr.find(class_="saletitle_f").text
+        else:
+            title = f.text
+        title = title.strip()
+        f = tr.find(class_="saledate")
+        if f is None:
+            date = tr.find(class_="saledate_f").text
+        else:
+            date = f.text
+        date = date.strip()
+        detail = tr.find(class_="saledetail").text
         d = dict(shop=shop, address=address, title=title, date=date, detail=detail)
         saleinfo.append(d)
     return saleinfo
