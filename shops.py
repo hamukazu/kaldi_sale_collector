@@ -8,6 +8,12 @@ import requests
 
 URL_TEMPLATE = "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=0&ftop=1&adr={:02d}&pg={}"
 
+def shop_name_split(s):
+    if "】" in s:
+        idx = s.index("】")+1
+        return (s[:idx].strip(), s[idx:].strip())
+    else:
+        return (None, s)
 
 class ShopInfoDownloader:
     def __init__(self):
@@ -49,7 +55,11 @@ def parse(htmls):
         pref = tables[0].tbody.td.text
         for tr in tables[1].tbody.find_all("tr"):
             tds = tr.find_all("td")
-            ret.append((pref, tds[0].text.strip(), tds[1].text.strip()))
+            note, name = shop_name_split(tds[0].text.strip())
+            address = tds[1].text.strip()
+            d = {"prefecture": pref, "name": name, "address": address, "note":note}
+            ret.append(d)
+            
     return ret
 
 
@@ -59,16 +69,17 @@ def main():
     shops = parse(htmls)
     with open("shops.csv", "w") as fp:
         writer = csv.writer(fp)
-        writer.writerow(("index", "都道府県", "店舗名", "住所"))
+        writer.writerow(("index", "都道府県", "店舗名", "住所", "備考"))
         index = 1
         for s in shops:
-            writer.writerow((index,) + s)
+            if s["note"] is None:
+                note = ""
+            else:
+                note = s["note"]
+            writer.writerow((index, s["prefecture"], s["name"], s["address"], note))
             index += 1
-    shops2 = list(
-        map(lambda x: {"prefecture": x[0], "name": x[1], "address": x[2]}, shops)
-    )
     with open("shops.json", "w") as fp:
-        json.dump(shops2, fp)
+        json.dump(shops, fp)
 
 
 if __name__ == "__main__":

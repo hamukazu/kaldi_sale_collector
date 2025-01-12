@@ -8,10 +8,7 @@ def lambda_handler(event, context):
     sid = shops.ShopInfoDownloader()
     htmls = sid.get()
     shop_data = shops.parse(htmls)
-    shop_data2 = list(
-        map(lambda x: {"prefecture": x[0], "name": x[1], "address": x[2]}, shop_data)
-    )
-    store.put(json.dumps(shop_data2))
+    store.put(json.dumps(shop_data))
 
 
 if __name__ == "__main__":

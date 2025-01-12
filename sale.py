@@ -11,6 +11,13 @@ from selenium import webdriver
 URL = "https://kaldi.co.jp"
 
 
+def shop_name_split(s):
+    if "】" in s:
+        idx = s.index("】")+1
+        return (s[:idx].strip(), s[idx:].strip())
+    else:
+        return (None, s)
+
 class SaleInfoDownloader:
     def __init__(self):
         pass
@@ -67,7 +74,7 @@ def parse(html):
     saleinfo = []
     for tr in trs:
         shop = tr.find("a").text
-        shop = shop.strip()
+        _, shop = shop_name_split(shop.strip())
         address = tr.find(class_="saleadress").text
         address = address.strip()
         f = tr.find(class_="saletitle")
