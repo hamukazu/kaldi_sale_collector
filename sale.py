@@ -8,15 +8,13 @@ import requests
 from selenium import webdriver
 
 
-URL = "https://kaldi.co.jp"
-
-
 def shop_name_split(s):
     if "】" in s:
-        idx = s.index("】")+1
+        idx = s.index("】") + 1
         return (s[:idx].strip(), s[idx:].strip())
     else:
         return (None, s)
+
 
 class SaleInfoDownloader:
     def __init__(self):
@@ -26,12 +24,7 @@ class SaleInfoDownloader:
         if save_dir is None or not os.path.exists(save_dir):
             if save_dir is not None:
                 os.makedirs(save_dir, exist_ok=True)
-            r = requests.get(URL)
-            soup = bs4.BeautifulSoup(r.text, "html.parser")
-            for a in soup.find_all("a"):
-                if a.text == "周年セール":
-                    href = a["href"]
-                    break
+            href = "https://map.kaldi.co.jp/kaldi/articleList?account=kaldi&accmd=1"
             options = webdriver.chrome.options.Options()
             if os.uname().sysname != "Darwin":
                 service = webdriver.ChromeService("/opt/chromedriver")
